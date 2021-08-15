@@ -205,12 +205,11 @@ export default {
           `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
         );
         const data = await f.json();
-        console.log(data);
 
         this.tickers.find((t) => t.name === currentTicker.name).price =
           data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
 
-        if (this.sel.name === currentTicker.name) {
+        if (this.sel?.name === currentTicker.name) {
           this.graph.push(data.USD);
         }
       }, 5000);
@@ -235,4 +234,5 @@ export default {
 };
 </script>
 
-<style src="./app.css"></style>
+<style src="./app.css">
+</style>
