@@ -4,17 +4,12 @@
       <section>
         <div class="flex">
           <div class="max-w-xs">
-            <label
-              @click="console"
-              for="wallet"
-              class="block text-sm font-medium text-gray-700"
-            >
+            <label for="wallet" class="block text-sm font-medium text-gray-700">
               Тикер
             </label>
             <div class="mt-1 relative rounded-md shadow-md">
               <input
                 @keydown.enter="add"
-                @keydown.f="console(log)"
                 v-model="ticker"
                 type="text"
                 name="wallet"
@@ -33,33 +28,6 @@
                 "
                 placeholder="Например DOGE"
               />
-            </div>
-            <div
-              v-if="ticker"
-              class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
-            >
-              <span
-                v-for="(hint, idx) in hints"
-                :key="idx"
-                @click="addTickerFromHint(hint.name)"
-                class="
-                  inline-flex
-                  items-center
-                  px-2
-                  m-1
-                  rounded-md
-                  text-xs
-                  font-medium
-                  bg-gray-300
-                  text-gray-800
-                  cursor-pointer
-                "
-              >
-                {{ hint.name }}
-              </span>
-            </div>
-            <div v-if="checkTicker()" class="text-sm text-red-600">
-              Такой тикер уже добавлен
             </div>
           </div>
         </div>
@@ -222,10 +190,6 @@ export default {
       tickers: [],
       sel: null,
       graph: [],
-      hints: [
-        { name: "BTC", idx: "42" },
-        { name: "DOGE", idx: "12" },
-      ],
     };
   },
   methods: {
@@ -241,20 +205,16 @@ export default {
           `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
         );
         const data = await f.json();
-        console.log(data);
 
         this.tickers.find((t) => t.name === currentTicker.name).price =
           data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
 
-        if (this.sel.name === currentTicker.name) {
+        if (this.sel?.name === currentTicker.name) {
           this.graph.push(data.USD);
         }
       }, 5000);
 
       this.ticker = "";
-    },
-    console(log) {
-      console.log();
     },
     select(ticker) {
       this.sel = ticker;
@@ -266,52 +226,13 @@ export default {
     normalizeGraph() {
       const maxValue = Math.max(...this.graph);
       const minValue = Math.min(...this.graph);
-
       return this.graph.map(
         (price) => 5 + ((price - minValue) * 95) / (maxValue - minValue)
       );
-    },
-    addTickerFromHint(hint) {
-      const hintTicker = {
-        name: hint,
-        price: "--",
-      };
-      if (this.tickers.find((t) => t.name === hint)) {
-        return false;
-      } else {
-        this.tickers.push(hintTicker);
-      }
-
-      setInterval(async () => {
-        const f = await fetch(
-          `https://min-api.cryptocompare.com/data/price?fsym=${hint}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
-        );
-        const data = await f.json();
-
-        this.tickers.find((t) => t.name === hint).price =
-          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
-
-        if (this.sel?.name === hint) {
-          this.graph.push(data.USD);
-        }
-      }, 5000);
-
-      this.ticker = hint;
-    },
-    checkTicker() {
-      return this.tickers
-        .map(
-          (ticker) => ticker.name.toLowerCase() === this.ticker.toLowerCase()
-        )
-        .find((i) => i === true);
     },
   },
 };
 </script>
 
-<<<<<<< HEAD
-<style>
+<style src="./app.css">
 </style>
-=======
-<style src="./app.css"></style>
->>>>>>> d51ca8c953d0b0cd9746d118678777558a3ce8d3
