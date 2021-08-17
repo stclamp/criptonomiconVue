@@ -5,11 +5,7 @@
         <div class="flex">
           <div class="max-w-xs">
             <label
-<<<<<<< HEAD
               @click="addHints"
-=======
-              @click="console"
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
               for="wallet"
               class="block text-sm font-medium text-gray-700"
             >
@@ -43,11 +39,7 @@
               />
             </div>
             <div
-<<<<<<< HEAD
               v-if="hints.length > 0"
-=======
-              v-if="ticker"
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
               class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap"
             >
               <span
@@ -70,7 +62,6 @@
                 {{ hint.name }}
               </span>
             </div>
-<<<<<<< HEAD
             <div
               :class="{
                 block: t == false,
@@ -78,10 +69,9 @@
               }"
               class="text-sm text-red-600"
             >
-=======
-            <div v-if="checkTicker()" class="text-sm text-red-600">
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
-              Такой тикер уже добавлен
+              <div v-if="checkTicker()" class="text-sm text-red-600">
+                Такой тикер уже добавлен
+              </div>
             </div>
           </div>
         </div>
@@ -127,9 +117,82 @@
       </section>
       <template v-if="tickers.length">
         <hr class="w-full border-t border-gray-600 my-4" />
+        <div class="max-w-xs">
+          <button
+            class="
+              mx-2
+              my-4
+              inline-flex
+              items-center
+              py-2
+              px-4
+              border border-transparent
+              shadow-sm
+              text-sm
+              leading-4
+              font-medium
+              rounded-full
+              text-white
+              bg-gray-600
+              hover:bg-gray-700
+              transition-colors
+              duration-300
+              focus:outline-none
+              focus:ring-2 focus:ring-offset-2 focus:ring-gray-500
+            "
+          >
+            Назад
+          </button>
+          <button
+            class="
+              mx-2
+              my-4
+              inline-flex
+              items-center
+              py-2
+              px-4
+              border border-transparent
+              shadow-sm
+              text-sm
+              leading-4
+              font-medium
+              rounded-full
+              text-white
+              bg-gray-600
+              hover:bg-gray-700
+              transition-colors
+              duration-300
+              focus:outline-none
+              focus:ring-2 focus:ring-offset-2 focus:ring-gray-500
+            "
+          >
+            Вперед
+          </button>
+
+          <div>
+            Фильтр:
+            <input
+              v-model="filter"
+              type="text"
+              class="
+                block
+                w-full
+                pr-10
+                border-gray-300
+                text-gray-900
+                focus:outline-none
+                focus:ring-gray-500
+                focus:border-gray-500
+                sm:text-sm
+                rounded-md
+              "
+            />
+          </div>
+        </div>
+        <hr class="w-full border-t border-gray-600 my-4" />
         <dl class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           <div
-            v-for="t in tickers"
+            v-for="t in filterTicker()"
             :key="t"
             @click="select(t)"
             :class="{
@@ -244,18 +307,46 @@ export default {
       tickers: [],
       sel: null,
       graph: [],
-<<<<<<< HEAD
       hints: [],
       t: true,
-=======
-      hints: [
-        { name: "BTC", idx: "42" },
-        { name: "DOGE", idx: "12" },
-      ],
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
+      page: 1,
+      filter: "",
     };
   },
+
+  created() {
+    const cryptoList = localStorage.getItem("crypto-list");
+    if (cryptoList) {
+      this.tickers = JSON.parse(cryptoList);
+    }
+
+    this.tickers.forEach((item) => {
+      this.setUpdate(item.name);
+    });
+  },
+
   methods: {
+    filterTicker() {
+      return this.tickers.filter((t) =>
+        t.name.toLowerCase().includes(this.filter.toLowerCase())
+      );
+    },
+    setUpdate(tickerName) {
+      setInterval(async () => {
+        const f = await fetch(
+          `https://min-api.cryptocompare.com/data/price?fsym=${tickerName}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
+        );
+        const data = await f.json();
+        console.log(data);
+
+        this.tickers.find((t) => t.name === tickerName).price =
+          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+
+        if (this.sel?.name === tickerName) {
+          this.graph.push(data.USD);
+        }
+      }, 5000);
+    },
     add() {
       if (
         this.tickers
@@ -272,27 +363,13 @@ export default {
         };
 
         this.tickers.push(currentTicker);
-        setInterval(async () => {
-          const f = await fetch(
-            `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
-          );
-          const data = await f.json();
-          console.log(data);
+        this.setUpdate(currentTicker.name);
 
-          this.tickers.find((t) => t.name === currentTicker.name).price =
-            data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
-
-          if (this.sel?.name === currentTicker.name) {
-            this.graph.push(data.USD);
-          }
-        }, 5000);
+        localStorage.setItem("crypto-list", JSON.stringify(this.tickers));
 
         this.ticker = "";
         return (this.t = true);
       }
-    },
-    console(log) {
-      console.log();
     },
     select(ticker) {
       this.sel = ticker;
@@ -312,7 +389,6 @@ export default {
         (price) => 5 + ((price - minValue) * 95) / (maxValue - minValue)
       );
     },
-<<<<<<< HEAD
     addHints() {
       setTimeout(async () => {
         const f = await fetch(
@@ -352,49 +428,10 @@ export default {
         } else {
           this.tickers.push(hintTicker);
         }
+        localStorage.setItem("crypto-list", JSON.stringify(this.tickers));
 
-        setInterval(async () => {
-          const f = await fetch(
-            `https://min-api.cryptocompare.com/data/price?fsym=${hint}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
-          );
-          const data = await f.json();
-
-          this.tickers.find((t) => t.name === hint).price =
-            data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
-
-          if (this.sel?.name === hint) {
-            this.graph.push(data.USD);
-          }
-        }, 5000);
+        this.setUpdate(hint);
       }
-=======
-    addTickerFromHint(hint) {
-      const hintTicker = {
-        name: hint,
-        price: "--",
-      };
-      if (this.tickers.find((t) => t.name === hint)) {
-        return false;
-      } else {
-        this.tickers.push(hintTicker);
-      }
-
-      setInterval(async () => {
-        const f = await fetch(
-          `https://min-api.cryptocompare.com/data/price?fsym=${hint}&tsyms=USD&api_key=43343b349f4dd02cfbf28dd76817871f0d291a1289633fd2bbab8aa02f2fda9c`
-        );
-        const data = await f.json();
-
-        this.tickers.find((t) => t.name === hint).price =
-          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
-
-        if (this.sel?.name === hint) {
-          this.graph.push(data.USD);
-        }
-      }, 5000);
-
-      this.ticker = hint;
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
     },
     checkTicker() {
       return this.tickers
@@ -406,14 +443,5 @@ export default {
   },
 };
 </script>
-
-<<<<<<< HEAD
 <style></style>
-=======
-<<<<<<< HEAD
-<style>
-</style>
-=======
-<style src="./app.css"></style>
->>>>>>> d51ca8c953d0b0cd9746d118678777558a3ce8d3
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
+

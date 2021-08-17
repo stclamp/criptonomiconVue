@@ -7,14 +7,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@tailwindcss/forms": "^0.3.3",
-=======
-<<<<<<< HEAD
     "@tailwindcss/forms": "^0.3.3",
-=======
->>>>>>> d51ca8c953d0b0cd9746d118678777558a3ce8d3
->>>>>>> 376efdd45a2317ee56976000a7f8d1ddbf820fe9
     "@tailwindcss/postcss7-compat": "^2.0.2",
     "autoprefixer": "^9",
     "core-js": "^3.6.5",
